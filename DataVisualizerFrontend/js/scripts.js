@@ -224,12 +224,15 @@ function postData(_url, _data, onSuccess) {
         dataType: "json",
         success: onSuccess,
         error: function (err) {
-            console.error("AJAX post request failed. Server response: ", err);
-            if (err.status == 500) {
+            console.error("AJAX post request failed. Error " + err.status + ". Server response: ", err);
+
+            if (err.status == 500)
                 toastr.error(err.responseJSON.ExceptionMessage, 'SQL Error');
-            } else if (err.status == 400) {
-                App.ModelState.showResponseErrors($('#databaseInformationForm'), err.responseJSON);
-            }
+            else if (err.status == 400)
+                App.ModelState.showResponseErrors($('#databaseInformationForm'), err.responseJSON);                
+            else if (err.status == 0)
+                toastr.error('API not found. Please make sure that apiAddress is correct.', 'API Connection Error');
+
         },
         complete: function () {
             $('#loading').modal('hide');
