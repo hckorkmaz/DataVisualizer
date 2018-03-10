@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Data Visualizer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="lib/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="lib/jquery/chosen.jquery/chosen.min.css">
+    <link rel="stylesheet" href="lib/toastr/toastr.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                    aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="">Data Visualizer</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
+
+    <div class="container">
+        <div id="databaseInformation" class="panel panel-default">
+            <div class="panel-body">
+                <section>
+                    <legend>
+                        <h3>Database Information</h3>
+                    </legend>
+                    <form id="databaseInformationForm">
+                        <div class="col-md-4 col-md-offset-4">
+                            <div class="form-group">
+                                <label for="server">Server Address:</label>
+                                <input type="text" class="form-control" id="Server" name="Server">
+                                <span class="field-validation-error" data-valmsg-for="Server" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="database">Database Name:</label>
+                                <input type="text" class="form-control" id="DatabaseName" name="DatabaseName">
+                                <span class="field-validation-error" data-valmsg-for="DatabaseName" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="username">Username:</label>
+                                <input type="text" class="form-control" id="Username" name="Username">
+                                <span class="field-validation-error" data-valmsg-for="Username" data-valmsg-replace="true"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Password:</label>
+                                <input type="password" class="form-control" id="Password" name="Password">
+                                <span class="field-validation-error" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+                            </div>
+                            <button id="submitDatabaseInformationForm" type="submit" class="btn btn-default btn-success pull-right">Get Objects</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+        <div id="databaseObjects" class="panel panel-default" style="display:none;">
+            <div class="panel-body">
+                <section>
+                    <legend>
+                        <h3>Select a Database Object</h3>
+                    </legend>
+                    <form id="databaseInformationForm">
+                        <div class="col-md-4 col-md-offset-4">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">Information</div>
+                                <div class="panel-body">
+                                    <b>Data Column</b> should be numeric in order to render a chart.
+                                    <br>
+                                    <br>
+                                    <b>Label Column</b> will be the labelling column for the provided data.
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="server">Object Type:</label>
+                                <select id="ddDatabaseObjects" style="width: 100%" data-placeholder="Choose an object type" class="chosen-select" tabindex="1"
+                                    onchange="selectObject(this.value)">
+                                </select>
+                            </div>
+                            <div id="labelColumnFormGroup" class="form-group" style="display:none;">
+                                <label for="server">Label Column:</label>
+                                <select id="ddLabelColumn" style="width: 100%" data-placeholder="Choose a column" class="chosen-select" tabindex="2">
+                                </select>
+                            </div>
+                            <div id="dataColumnFormGroup" class="form-group" style="display:none;">
+                                <label for="server">Data Column:</label>
+                                <select id="ddDataColumn" style="width: 100%" data-placeholder="Choose a column" class="chosen-select" tabindex="3">
+                                </select>
+                            </div>
+                            <div id="chartTypeFormGroup" class="form-group" style="display:none;">
+                                <label for="server">Data Column:</label>
+                                <select id="ddChartType" style="width: 100%" data-placeholder="Choose a column" class="chosen-select" tabindex="4">
+                                    <option value="bar">Bar Chart</option>
+                                    <option value="line">Line Chart</option>
+                                    <option value="radar">Radar Chart</option>
+                                    <option value="pie">Pie Chart</option>
+                                    <option value="doughnut">Doughnut Chart</option>
+                                </select>
+                            </div>
+                            <a id="visualizeData" onclick="visualizeData()" class="btn btn-default btn-success pull-right" style="display:none;">Render Chart</a>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="chartModal" tabindex="-1" role="dialog" aria-labelledby="chartModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="chartModalLabel">Data Chart</h4>
+                </div>
+                <div class="modal-body">
+                    <canvas id="myChart"></canvas>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loading" class="modal fade" data-backdrop="static" data-keyboard="false">
+        <img src="img/loading.gif" class="center-block" style="width:90px">
+    </div>
+
+    <!-- Including Bootstrap JS (with its jQuery dependency) so that dynamic components work -->
+    <script src="lib/jquery/jquery.min.js"></script>
+    <script src="lib/jquery/jquery.validate/jquery.validate.min.js"></script>
+    <script src="lib/jquery/chosen.jquery/chosen.jquery.min.js"></script>
+    <script src="lib/bootstrap/bootstrap.min.js"></script>
+    <script src="lib/chartjs/Chart.min.js"></script>
+    <script src="lib/toastr/toastr.min.js"></script>
+    <script src="lib/modelstate/modelstate.js"></script>
+
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
