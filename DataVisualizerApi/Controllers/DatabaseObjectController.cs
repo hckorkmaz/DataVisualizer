@@ -1,31 +1,30 @@
 ﻿using DataVisualizerApi.DatabaseProcedures;
 using DataVisualizerApi.Helper;
 using DataVisualizerApi.Models;
-using DataVisualizerAPI.Models;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 
-namespace DataVisualizerAPI.Controllers
+namespace DataVisualizerApi.Controllers
 {
-    public class DatabaseObjectController : ApiController
+    [Produces("application/json")]
+    [Route("api/DatabaseObject")]
+    public class DatabaseObjectController : Controller
     {
         /// <summary>
         /// Returns tables for given database configuration.
         /// </summary>
         /// <param name="databaseConfig"></param>
         /// <returns></returns>
-        [HttpPost]
-        public HttpResponseMessage GetTables(DatabaseConfig databaseConfig)
+        [HttpPost("GetTables")]
+        public IActionResult GetTables(DatabaseConfig databaseConfig)
         {
             if (ModelState.IsValid)
             {
                 var tables = DatabaseObjectProvider.GetTables(databaseConfig);
 
-                return Request.CreateResponse(HttpStatusCode.OK, tables.DataTableToList<DatabaseObject>());
+                return Ok(tables.DataTableToList<DatabaseObject>());
             }
 
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            return BadRequest(ModelState);
         }
 
         /// <summary>
@@ -33,17 +32,17 @@ namespace DataVisualizerAPI.Controllers
         /// </summary>
         /// <param name="databaseConfig"></param>
         /// <returns></returns>
-        [HttpPost]
-        public HttpResponseMessage GetProcedures(DatabaseConfig databaseConfig)
+        [HttpPost("GetProcedures")]
+        public IActionResult GetProcedures(DatabaseConfig databaseConfig)
         {
             if (ModelState.IsValid)
             {
                 var procedures = DatabaseObjectProvider.GetProcedures(databaseConfig);
 
-                return Request.CreateResponse(HttpStatusCode.OK, procedures.DataTableToList<DatabaseObject>());
+                return Ok(procedures.DataTableToList<DatabaseObject>());
             }
 
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            return BadRequest(ModelState);
         }
 
         /// <summary>
@@ -51,17 +50,17 @@ namespace DataVisualizerAPI.Controllers
         /// </summary>
         /// <param name="databaseConfig"></param>
         /// <returns></returns>
-        [HttpPost]
-        public HttpResponseMessage GetFunctions(DatabaseConfig databaseConfig)
+        [HttpPost("GetFunctions")]
+        public IActionResult GetFunctions(DatabaseConfig databaseConfig)
         {
             if (ModelState.IsValid)
             {
                 var procedures = DatabaseObjectProvider.GetFunctions(databaseConfig);
 
-                return Request.CreateResponse(HttpStatusCode.OK, procedures.DataTableToList<DatabaseObject>());
+                return Ok(procedures.DataTableToList<DatabaseObject>());
             }
 
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            return BadRequest(ModelState);
         }
 
         /// <summary>
@@ -69,17 +68,17 @@ namespace DataVisualizerAPI.Controllers
         /// </summary>
         /// <param name="databaseConfig"></param>
         /// <returns></returns>
-        [HttpPost]
-        public HttpResponseMessage GetViews(DatabaseConfig databaseConfig)
+        [HttpPost("GetViews")]
+        public IActionResult GetViews(DatabaseConfig databaseConfig)
         {
             if (ModelState.IsValid)
             {
                 var views = DatabaseObjectProvider.GetViews(databaseConfig);
 
-                return Request.CreateResponse(HttpStatusCode.OK, views.DataTableToList<DatabaseObject>());
+                return Ok(views.DataTableToList<DatabaseObject>());
             }
 
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            return BadRequest(ModelState);
         }
 
         /// <summary>
@@ -87,8 +86,8 @@ namespace DataVisualizerAPI.Controllers
         /// </summary>
         /// <param name="databaseConfig"></param>
         /// <returns></returns>
-        [HttpPost]
-        public HttpResponseMessage GetAll(DatabaseConfig databaseConfig)
+        [HttpPost("GetAll")]
+        public IActionResult GetAll(DatabaseConfig databaseConfig)
         {
             if (ModelState.IsValid)
             {
@@ -102,10 +101,11 @@ namespace DataVisualizerAPI.Controllers
                 objects.Merge(functions);
                 objects.Merge(procedures);
 
-                return Request.CreateResponse(HttpStatusCode.OK, objects.DataTableToList<DatabaseObject>());
+                var result = objects.DataTableToList<DatabaseObject>();
+                return Ok(result);
             }
 
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            return BadRequest(ModelState);
         }
     }
 }

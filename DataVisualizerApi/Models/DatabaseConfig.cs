@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DataVisualizerAPI.Models
+namespace DataVisualizerApi.Models
 {
     /// <summary>
     /// Use this entity in order to pass it to DataProvider methods.

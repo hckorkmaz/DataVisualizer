@@ -1,5 +1,4 @@
 ﻿using DataVisualizerApi.Models;
-using DataVisualizerAPI.Models;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -42,9 +41,12 @@ namespace DataVisualizerApi.DatabaseProcedures
                 using (SqlDataAdapter dataAdapter = new SqlDataAdapter(query, connection))
                 {
                     connection.Open();
-                    DataTable dataTable = new DataTable();
-                    dataAdapter.Fill(dataTable);
 
+                    DataSet dataSet = new DataSet();
+                    dataSet.Tables.Add("DataTable");
+                    dataAdapter.Fill(dataSet, "DataTable");
+
+                    var dataTable = dataSet.Tables["DataTable"];
                     return dataTable;
                 }
             }

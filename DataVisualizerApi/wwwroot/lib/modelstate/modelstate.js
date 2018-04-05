@@ -11,6 +11,7 @@
         };
 
         ModelState.showResponseErrors = function (jForm, jqXHR) {
+            debugger;
             var response = jqXHR;
             if (typeof response.ModelState === 'undefined') {
                 return false;
@@ -38,10 +39,11 @@
         };
 
         ModelState.renderFieldErrors = function (jForm, name, errors) {
+            debugger;
             for (var i = 0; i < errors.length; i++) {
                 var errorText = errors[i];
 
-                var currDom = $('#' + name.split('.')[1]);
+                var currDom = $('#' + name);
                 if (currDom.length == 0)
                     continue;
 
@@ -52,7 +54,7 @@
                 if (!$(currDom).parents(".form-group").hasClass('input-validation-error'))
                     $(currDom).parents(".form-group").addClass("has-error").removeClass("has-success");;
 
-                var currDisplay = $(currForm).find("[data-valmsg-for='" + name.split('.')[1] + "']");
+                var currDisplay = $(currForm).find("[data-valmsg-for='" + name + "']");
                 if (currDisplay.length > 0) {
                     currDisplay.removeClass("field-validation-valid").addClass("field-validation-error");
                     if (currDisplay.attr("data-valmsg-replace")) {

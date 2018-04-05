@@ -1,4 +1,4 @@
-var apiAddress = "http://localhost:1881/api";
+var apiAddress = "/api";
 
 var server, databaseName, username, password;
 var databaseObjects = [];
@@ -40,7 +40,7 @@ $(function () {
             Username: {
                 required: "Please enter a username"
             },
-            pasPasswordsword: {
+            Password: {
                 required: "Please enter a password"
             }
         },
@@ -78,7 +78,7 @@ $(function () {
 
                 var ddDatabaseObjects = $("#ddDatabaseObjects");
                 $.each(data, function (idx, obj) {
-                    ddDatabaseObjects.append('<option value="' + obj.Name + '">' + obj.Name + '</option>');
+                    ddDatabaseObjects.append('<option value="' + obj.name + '">' + obj.name + '</option>');
                 });
 
                 ddDatabaseObjects.trigger("chosen:updated");
@@ -101,19 +101,19 @@ function getDatabaseData() {
             Username: username,
             Password: password
         },
-        DbObjectName: selectedObject.Name,
-        DbObjectType: selectedObject.Type
+        DbObjectName: selectedObject.name,
+        DbObjectType: selectedObject.type
     }
 
     postData(apiAddress + "/DatabaseData/GetData", input, function (data) {
-        selectedObjectsData = data;
 
         var ddLabelColumn = $("#ddLabelColumn"); ddLabelColumn.empty();
         var ddDataColumn = $("#ddDataColumn"); ddDataColumn.empty();
 
-        if (data.length == 0) {
+        if (data.length == 0 || data.value.DocumentElement == null) {
             ddLabelColumn.trigger("chosen:updated");
             ddDataColumn.trigger("chosen:updated");
+			selectedObjectsData == null;
 
             $("#labelColumnFormGroup").hide();
             $("#dataColumnFormGroup").hide();
@@ -124,7 +124,8 @@ function getDatabaseData() {
             return;
         }
 
-        var exampleRecord = data[0];
+        selectedObjectsData = data.value.DocumentElement.DataTable;
+        var exampleRecord = data.value.DocumentElement.DataTable[0];
         var keys = Object.keys(exampleRecord);
 
         keys.forEach(function (k) {
@@ -205,7 +206,7 @@ function renderChart() {
 // Triggered when database object dropdown changed.
 function selectObject(objectName) {
     var filteredObjects = databaseObjects.filter(function (obj) {
-        return obj.Name == objectName;
+        return obj.name == objectName;
     });
 
     if (filteredObjects && filteredObjects.constructor === Array && filteredObjects.length > 0) {
@@ -221,15 +222,21 @@ function postData(_url, _data, onSuccess) {
         type: "POST",
         url: _url,
         data: _data,
-        dataType: "json",
+	    dataType: "json",
         success: onSuccess,
         error: function (err) {
+        	debugger;
             console.error("AJAX post request failed. Error " + err.status + ". Server response: ", err);
 
             if (err.status == 500)
-                toastr.error(err.responseJSON.ExceptionMessage, 'SQL Error');
-            else if (err.status == 400)
-                App.ModelState.showResponseErrors($('#databaseInformationForm'), err.responseJSON);                
+                toastr.error(err.responseJSON.error, 'SQL Error');
+            else if (err.status == 400){
+            	var response = {};
+            	response.ModelState = JSON.parse(err.responseText);
+                App.ModelState.showResponseErrors($('#databaseInformationForm'), response);
+            }
+            else if (err.status == 404)
+                toastr.error('AJAX post request failed. Check the API.', 'Not Found');           
             else if (err.status == 0)
                 toastr.error('API not found. Please make sure that apiAddress is correct.', 'API Connection Error');
 

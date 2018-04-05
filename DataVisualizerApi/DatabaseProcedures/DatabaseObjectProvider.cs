@@ -1,5 +1,4 @@
 ﻿using DataVisualizerApi.Models;
-using DataVisualizerAPI.Models;
 using System.Data;
 using System.Data.SqlClient;
 

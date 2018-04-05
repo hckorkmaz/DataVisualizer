@@ -1,29 +1,47 @@
 ﻿using DataVisualizerApi.DatabaseProcedures;
-using DataVisualizerAPI.Models;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+using DataVisualizerApi.Helper;
+using DataVisualizerApi.Models;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Xml.Linq;
 
-namespace DataVisualizerAPI.Controllers
+namespace DataVisualizerApi.Controllers
 {
-    public class DatabaseDataController : ApiController
+    [Produces("application/json")]
+    [Route("api/DatabaseData")]
+    public class DatabaseDataController : Controller
     {
         /// <summary>
         /// Gets the data from the database that has been given inside of the model.
         /// </summary>
         /// <param name="dataReciever"></param>
         /// <returns></returns>
-        [HttpPost]
-        public HttpResponseMessage GetData(DatabaseDataReciever dataReciever)
+        [HttpPost("GetData")]
+        public IActionResult GetData(DatabaseDataReciever dataReciever)
         {
             if (ModelState.IsValid)
             {
-                var tables = DatabaseDataProvider.GetData(dataReciever);
+                try
+                {
+                    var tables = DatabaseDataProvider.GetData(dataReciever);
+                    var nullFilledTable = Helper.Helper.GetNullFilledDataTableForXML(tables);
 
-                return Request.CreateResponse(HttpStatusCode.OK, tables);
+                    var xml = new XDocument();
+                    using (var writer = xml.CreateWriter())
+                    {
+                        nullFilledTable.WriteXml(writer);
+                        writer.Flush();
+                    }
+
+                    return Ok(Json(xml));
+                }
+                catch (Exception e)
+                {
+                    return BadRequest(e.Message);
+                }
             }
 
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
+            return BadRequest(ModelState.GetModelStateErrors());
         }
     }
 }

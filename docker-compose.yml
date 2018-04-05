@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  datavisualizerapi:
+    image: datavisualizerapi
+    build:
+      context: .
+      dockerfile: DataVisualizerApi\Dockerfile
